@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block title %}Visitor Registration · Campus GatePass{% endblock %}
+
+{% block content %}
+<style>
+  /* Inherits the same custom UI/UX from the login page for consistency */
+  .gatepass-card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    max-width: 900px;
+    margin: 2rem auto;
+  }
+  
+  .gatepass-brand-panel {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .gatepass-form-panel {
+    padding: 3.5rem;
+    background-color: #ffffff;
+  }
+
+  .form-floating > label {
+    color: #6b7280;
+  }
+  
+  .form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+  }
+
+  /* Custom styling for the file input to match the light theme */
+  .form-control[type="file"] {
+    padding: 0.8rem;
+    color: #4b5563;
+  }
+  
+  .form-control[type="file"]::file-selector-button {
+    background-color: #e5e7eb;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    margin-right: 1rem;
+    color: #374151;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .form-control[type="file"]::file-selector-button:hover {
+    background-color: #d1d5db;
+  }
+
+  .btn-gatepass {
+    background-color: #1e3a8a;
+    border-color: #1e3a8a;
+    padding: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-gatepass:hover {
+    background-color: #172554;
+    border-color: #172554;
+    transform: translateY(-1px);
+  }
+
+  .auth-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .auth-link:hover {
+    text-decoration: underline;
+    color: #1e3a8a;
+  }
+
+  @media (max-width: 768px) {
+    .gatepass-brand-panel {
+      padding: 2rem;
+      text-align: center;
+    }
+    .gatepass-form-panel {
+      padding: 2rem;
+    }
+  }
+</style>
+
+<div class="container">
+  <div class="card gatepass-card">
+    <div class="row g-0">
+      
+      <!-- Left Branding Panel -->
+      <div class="col-md-5 gatepass-brand-panel">
+        <div class="mb-4 d-md-block d-none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-person-badge" viewBox="0 0 16 16">
+            <path d="M6.5 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+            <path d="M4.5 0A2.5 2.5 0 0 0 2 2.5V14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2.5A2.5 2.5 0 0 0 11.5 0h-7zM3 2.5A1.5 1.5 0 0 1 4.5 1h7A1.5 1.5 0 0 1 13 2.5v10.795a4.2 4.2 0 0 0-.776-.492C11.392 12.387 10.063 12 8 12s-3.392.387-4.224.803a4.2 4.2 0 0 0-.776.492V2.5z"/>
+          </svg>
+        </div>
+        <h2 class="fw-bold mb-3">Visitor Registration</h2>
+        <p class="opacity-75 mb-0">Create your profile to easily generate, manage, and track your campus visit requests.</p>
+      </div>
+
+      <!-- Right Form Panel -->
+      <div class="col-md-7 gatepass-form-panel">
+        <div class="mb-4">
+          <h3 class="fw-bold text-dark">Create an Account</h3>
+          <p class="text-muted small">Please fill in your details to register</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="vstack gap-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          
+          <!-- Full Name -->
+          <div class="form-floating">
+            <input type="text" class="form-control bg-light border-0" id="nameInput" name="name" placeholder="Full name" required autofocus>
+            <label for="nameInput">Full Name</label>
+          </div>
+
+          <!-- Email & Phone on the same row for better space usage -->
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="form-floating">
+                <input type="email" class="form-control bg-light border-0" id="emailInput" name="email" placeholder="Email" required>
+                <label for="emailInput">Email Address</label>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-floating">
+                <input type="text" class="form-control bg-light border-0" id="phoneInput" name="phone" placeholder="Phone" required>
+                <label for="phoneInput">Phone Number</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-floating">
+            <input type="password" class="form-control bg-light border-0" id="passwordInput" name="password" placeholder="Password" required minlength="8">
+            <label for="passwordInput">Password (Min 8 characters)</label>
+          </div>
+
+          <!-- Profile Photo -->
+          <div>
+            <label for="photoInput" class="form-label text-muted small fw-bold mb-1 ms-1">Profile Photo (For Security Badge)</label>
+            <input class="form-control bg-light border-0" type="file" id="photoInput" name="photo" accept=".png,.jpg,.jpeg">
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary btn-gatepass w-100 mt-3 text-white shadow-sm">
+            Create Account
+          </button>
+
+          <!-- Back to Login -->
+          <div class="text-center mt-3">
+            <p class="text-muted small mb-0">Already have an account? <a href="{{ url_for('auth.login') }}" class="auth-link fw-bold">Sign In</a></p>
+          </div>
+          
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

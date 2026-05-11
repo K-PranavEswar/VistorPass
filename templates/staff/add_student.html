@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% set is_edit = student is defined and student %}
+{% block content %}
+<div class="page-head">
+  <h1>{{ 'Edit Student' if is_edit else 'Add Student' }}</h1>
+  <a class="btn btn-outline-primary" href="{{ url_for('staff.students') }}"><i class="bi bi-arrow-left"></i> Manage Students</a>
+</div>
+<div class="panel">
+  <form method="post" class="row g-3">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="col-md-6">
+      <label class="form-label">Student ID</label>
+      <input class="form-control" name="student_id" value="{{ student.student_id or student.college_id if is_edit else '' }}" placeholder="ST001" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Student Name</label>
+      <input class="form-control" name="student_name" value="{{ student.student_name or student.full_name if is_edit else '' }}" placeholder="Rahul Kumar" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Department</label>
+      <input class="form-control" name="department" value="{{ student.department if is_edit else '' }}" placeholder="Computer Science" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Course</label>
+      <select class="form-select" name="course" id="courseSelect" required>
+        {% for course in courses %}
+        <option value="{{ course }}" {% if is_edit and student.course == course %}selected{% endif %}>{{ course }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Admission Year</label>
+      <select class="form-select" name="admission_year" id="admissionYearSelect" required>
+        {% for year in admission_years %}
+        <option value="{{ year }}" {% if is_edit and student.admission_year == year %}selected{% endif %}>{{ year }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Phone Number</label>
+      <input class="form-control" name="phone" value="{{ student.phone if is_edit else '' }}" placeholder="9876543210" pattern="[6-9][0-9]{9}" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Batch</label>
+      <div class="form-control bg-light"><span class="badge text-bg-primary" id="batchPreview">{{ student.batch if is_edit and student.batch else '' }}</span></div>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Current Year</label>
+      <div class="form-control bg-light"><span class="badge text-bg-success" id="yearPreview">{{ student.current_year if is_edit and student.current_year else '' }}</span></div>
+    </div>
+    <div class="col-12">
+      <label class="form-label">Address</label>
+      <textarea class="form-control" name="address" rows="4" required>{{ student.address if is_edit else '' }}</textarea>
+    </div>
+    <div class="col-12 action-row">
+      <button class="btn btn-primary"><i class="bi bi-save"></i> Save Student</button>
+      <button class="btn btn-outline-secondary" type="reset"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const durations = {
+    "MCA": 2, "MBA": 2, "MSc": 2, "MA": 2, "MCom": 2,
+    "B.Tech": 4, "BHM": 4,
+    "BCA": 3, "BSc": 3, "BCom": 3, "BA": 3, "BBA": 3
+  };
+  const course = document.getElementById("courseSelect");
+  const admission = document.getElementById("admissionYearSelect");
+  const batch = document.getElementById("batchPreview");
+  const year = document.getElementById("yearPreview");
+  function suffix(value) {
+    if (value === 1) return "1st Year";
+    if (value === 2) return "2nd Year";
+    if (value === 3) return "3rd Year";
+    return `${value}th Year`;
+  }
+  function updatePreview() {
+    const duration = durations[course.value];
+    const admissionYear = parseInt(admission.value, 10);
+    const nowYear = new Date().getFullYear();
+    const currentNumber = Math.max(1, Math.min(duration, nowYear - admissionYear + 1));
+    batch.textContent = `${admissionYear}-${String(admissionYear + duration).slice(-2)}`;
+    year.textContent = currentNumber >= duration ? "Final Year" : suffix(currentNumber);
+  }
+  course.addEventListener("change", updatePreview);
+  admission.addEventListener("change", updatePreview);
+  updatePreview();
+});
+</script>
+{% endblock %}

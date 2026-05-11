@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}GatePass{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body class="app-body role-{{ current_user.role if current_user else 'guest' }}">
+<nav class="navbar navbar-expand-lg app-topbar sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">Smart GatePass</a>
+    <button class="navbar-toggler" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar"><span class="navbar-toggler-icon"></span></button>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      {% if current_user %}
+      <button class="btn btn-sm btn-outline-light position-relative" id="notifyBtn" type="button">
+        <i class="bi bi-bell"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notifyBadge">{{ unread_count }}</span>
+      </button>
+      <span class="small text-white-50">{{ current_user.name }} · {{ current_user.role|title }}</span>
+      <a class="btn btn-sm btn-light" href="{{ url_for('auth.logout') }}">Logout</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+{% if current_user %}
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar">
+  <div class="offcanvas-header"><h5 class="offcanvas-title">Menu</h5><button class="btn-close" data-bs-dismiss="offcanvas"></button></div>
+  <div class="offcanvas-body">{% include 'partials/sidebar.html' %}</div>
+</div>
+{% endif %}
+
+<main class="app-shell">
+  {% if current_user %}<aside class="sidebar d-none d-lg-block">{% include 'partials/sidebar.html' %}</aside>{% endif %}
+  <section class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">{{ message }}<button class="btn-close" data-bs-dismiss="alert"></button></div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

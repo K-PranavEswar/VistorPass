@@ -1,0 +1,36 @@
+<div class="panel visitor-card">
+  <div class="d-flex gap-3 align-items-center">
+    <img class="avatar-lg" src="{{ url_for('static', filename=visitor.visitor_photo or visitor.public_user.photo) if (visitor.visitor_photo or visitor.public_user.photo) else 'https://placehold.co/96x96?text=Visitor' }}">
+    <div>
+      <h2>{{ visitor.public_user.name }}</h2>
+      <p class="mb-0">{{ visitor.public_user.phone }} - {{ visitor.status }}</p>
+      <div class="status-pill mt-2">{{ visitor.visitor_type or 'Visitor' }}</div>
+    </div>
+  </div>
+  <hr>
+  <dl class="row">
+    <dt class="col-sm-4">Address</dt><dd class="col-sm-8">{{ visitor.address or '-' }}</dd>
+    <dt class="col-sm-4">Gender</dt><dd class="col-sm-8">{{ visitor.gender or '-' }}</dd>
+    <dt class="col-sm-4">Purpose</dt><dd class="col-sm-8">{{ visitor.purpose }}</dd>
+    <dt class="col-sm-4">Relationship</dt><dd class="col-sm-8">{{ visitor.relationship or '-' }}</dd>
+    <dt class="col-sm-4">Student ID</dt><dd class="col-sm-8">{{ visitor.student_id or '-' }}</dd>
+    <dt class="col-sm-4">Student Name</dt><dd class="col-sm-8">{{ visitor.student_name or '-' }}</dd>
+    <dt class="col-sm-4">Department / Year</dt><dd class="col-sm-8">{{ visitor.department or '-' }}{% if visitor.year_of_study %} - {{ visitor.year_of_study }}{% endif %}</dd>
+    <dt class="col-sm-4">Parent</dt><dd class="col-sm-8">{{ visitor.parent_name or '-' }}</dd>
+    <dt class="col-sm-4">Guardian</dt><dd class="col-sm-8">{{ visitor.guardian_name or '-' }}</dd>
+    <dt class="col-sm-4">Relative</dt><dd class="col-sm-8">{{ visitor.relative_name or '-' }}</dd>
+    <dt class="col-sm-4">Emergency Contact</dt><dd class="col-sm-8">{{ visitor.emergency_contact_name or '-' }}{% if visitor.emergency_contact_phone %} - {{ visitor.emergency_contact_phone }}{% endif %}</dd>
+    <dt class="col-sm-4">ID Proof Number</dt><dd class="col-sm-8">{{ visitor.id_proof_number or '-' }}</dd>
+    <dt class="col-sm-4">Visit</dt><dd class="col-sm-8">{{ visitor.visit_date }} at {{ visitor.visit_time }}</dd>
+    <dt class="col-sm-4">Authority</dt><dd class="col-sm-8">{{ visitor.authority.name }} - {{ visitor.authority.role|title }}</dd>
+  </dl>
+  <form method="post" action="{{ url_for('security.visitor_action', visitor_id=visitor.id) }}" class="action-row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button name="action" value="approve" class="btn btn-outline-success">Approve</button>
+    <button name="action" value="reject" class="btn btn-outline-danger">Reject</button>
+    <button name="action" value="forward" class="btn btn-primary">Forward</button>
+    <button name="action" value="waiting" class="btn btn-outline-warning">Move to Waiting</button>
+    <button name="action" value="entry" class="btn btn-success">Allow Entry</button>
+    <button name="action" value="exit" class="btn btn-dark">Mark Exit</button>
+  </form>
+</div>

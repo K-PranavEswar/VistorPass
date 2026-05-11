@@ -1,0 +1,39 @@
+<div class="table-responsive">
+<table class="table align-middle">
+  <thead>
+    <tr>
+      <th>Visitor</th>
+      <th>Type</th>
+      <th>Related To</th>
+      <th>Purpose</th>
+      <th>Phone</th>
+      <th>Date</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for visitor in pending %}
+  <tr>
+    <td><strong>{{ visitor.public_user.name }}</strong><div class="text-muted small">{{ visitor.address or '' }}</div></td>
+    <td>{{ visitor.visitor_type or 'Visitor' }}</td>
+    <td>{{ visitor.student_name or '-' }}<div class="text-muted small">{{ visitor.student_id or '' }} {{ visitor.department or '' }}</div></td>
+    <td>{{ visitor.purpose }}<div class="text-muted small">{{ visitor.relationship or '' }}</div></td>
+    <td>{{ visitor.public_user.phone }}</td>
+    <td>{{ visitor.visit_date }} {{ visitor.visit_time }}</td>
+    <td><span class="badge text-bg-info">{{ visitor.status }}</span></td>
+    <td>
+      <form method="post" action="{{ url_for(current_user.role + '.request_action', visitor_id=visitor.id) }}" class="action-row">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button name="action" value="approve" class="btn btn-sm btn-success">Approve</button>
+        <button name="action" value="reject" class="btn btn-sm btn-danger">Reject</button>
+        <button name="action" value="delay" class="btn btn-sm btn-warning">Delay</button>
+      </form>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="8" class="text-center text-muted">No active requests.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>

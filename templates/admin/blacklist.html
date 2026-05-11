@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><h1>Blacklist Visitors</h1></div>
+<div class="panel mb-3"><form method="post" class="row g-2"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="col-md-3"><input class="form-control" name="phone" placeholder="Phone"></div><div class="col-md-3"><input class="form-control" name="email" placeholder="Email"></div><div class="col-md-4"><input class="form-control" name="reason" placeholder="Reason" required></div><div class="col-md-2"><button class="btn btn-warning w-100">Add</button></div></form></div>
+<div class="panel"><table class="table"><thead><tr><th>Phone</th><th>Email</th><th>Reason</th><th>Created</th></tr></thead><tbody>{% for r in records %}<tr><td>{{ r.phone }}</td><td>{{ r.email }}</td><td>{{ r.reason }}</td><td>{{ r.created_at }}</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

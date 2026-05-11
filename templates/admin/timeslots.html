@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><h1>Time Slots</h1></div>
+<div class="panel mb-3"><form method="post" class="row g-2"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="col-md-4"><input class="form-control" name="label" placeholder="09:00 - 10:00" required></div><div class="col-md-3"><input class="form-control" name="start_time" type="time" required></div><div class="col-md-3"><input class="form-control" name="end_time" type="time" required></div><div class="col-md-2"><button class="btn btn-primary w-100">Add</button></div></form></div>
+<div class="panel"><table class="table"><thead><tr><th>Label</th><th>Start</th><th>End</th><th>Active</th></tr></thead><tbody>{% for s in slots %}<tr><td>{{ s.label }}</td><td>{{ s.start_time }}</td><td>{{ s.end_time }}</td><td>{{ s.is_active }}</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

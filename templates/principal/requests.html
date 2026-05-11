@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Principal Requests · Campus GatePass{% endblock %}
+
+{% block content %}
+<!-- Variable setup for the included partial -->
+{% set accent='Principal Requests' %}
+
+<style>
+  /* Unified UI/UX for Internal Dashboard Views */
+  .gatepass-dashboard-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(30, 58, 138, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .dashboard-card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background-color: #ffffff;
+    padding: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .gatepass-dashboard-header {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+    }
+    .dashboard-card {
+      padding: 1.5rem;
+    }
+  }
+</style>
+
+<div class="container py-4">
+  
+  <!-- Principal Requests Header Banner -->
+  <div class="gatepass-dashboard-header">
+    <div>
+      <div class="d-flex align-items-center justify-content-md-start justify-content-center gap-3 mb-2">
+        <!-- Checklist/Inbox Icon for Queue Management -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-ui-checks text-light opacity-75" viewBox="0 0 16 16">
+          <path d="M7 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zM2 1a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm0 8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H2zm.854-3.646a.5.5 0 0 1-.708 0l-1-1a.5.5 0 1 1 .708-.708l.646.647 1.646-1.647a.5.5 0 1 1 .708.708l-2 2zm0 8a.5.5 0 0 1-.708 0l-1-1a.5.5 0 0 1 .708-.708l.646.647 1.646-1.647a.5.5 0 0 1 .708.708l-2 2zM7 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1z"/>
+        </svg>
+        <h2 class="mb-0 fw-bold">{{ accent }}</h2>
+      </div>
+      <p class="mb-0 opacity-75">Review, approve, or deny pending visitor gatepass requests.</p>
+    </div>
+    
+    <div class="d-none d-md-block text-end">
+       <span class="badge bg-light text-primary rounded-pill px-3 py-2 shadow-sm fw-semibold">
+         Standard Queue
+       </span>
+    </div>
+  </div>
+
+  <!-- Embedded Authority Requests Partial -->
+  <!-- This wraps your existing included partial inside a clean, elevated container -->
+  <div class="dashboard-card position-relative">
+    {% include 'partials/authority_requests.html' %}
+  </div>
+
+</div>
+{% endblock %}

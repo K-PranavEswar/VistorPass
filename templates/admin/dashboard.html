@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><h1>Admin Analytics</h1></div>
+<div class="stat-grid">
+  <div class="stat-card"><span>Today</span><strong>{{ stats.daily }}</strong></div>
+  <div class="stat-card"><span>Approved</span><strong>{{ stats.approved }}</strong></div>
+  <div class="stat-card"><span>Rejected</span><strong>{{ stats.rejected }}</strong></div>
+  <div class="stat-card"><span>Users</span><strong>{{ stats.users }}</strong></div>
+</div>
+<div class="row g-3 mt-1">
+  <div class="col-lg-7"><div class="panel"><h2>Visitor Status</h2><canvas id="statusChart" height="110"></canvas></div></div>
+  <div class="col-lg-5"><div class="panel"><h2>Reports</h2><p class="text-muted">Daily visitors, monthly visitors, approvals, rejections, and peak visiting hours are available from visitor logs and QR scan logs.</p></div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>renderSimpleChart('statusChart', {{ visitors_by_status|map(attribute=0)|list|tojson }}, {{ visitors_by_status|map(attribute=1)|list|tojson }});</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head">
+  <h1>Student Profile</h1>
+  <a class="btn btn-outline-primary" href="{{ url_for('staff.students') }}"><i class="bi bi-arrow-left"></i> Manage Students</a>
+</div>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="panel text-center">
+      {% if student.qr_code %}
+      <img class="qr-img" src="{{ url_for('static', filename=student.qr_code) }}" alt="Student QR">
+      <a class="btn btn-success w-100 mt-3" href="{{ url_for('staff.download_student_qr', student_id=student.id) }}"><i class="bi bi-download"></i> Download QR</a>
+      {% else %}
+      <div class="alert alert-warning mb-0">QR code missing.</div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="panel">
+      <h2>{{ student.student_name or student.full_name }}</h2>
+      <dl class="row mb-0">
+        <dt class="col-sm-4">Student ID</dt><dd class="col-sm-8">{{ student.student_id or student.college_id }}</dd>
+        <dt class="col-sm-4">Department</dt><dd class="col-sm-8">{{ student.department }}</dd>
+        <dt class="col-sm-4">Course</dt><dd class="col-sm-8">{{ student.course or student.course_applied or '-' }}</dd>
+        <dt class="col-sm-4">Admission Year</dt><dd class="col-sm-8">{{ student.admission_year or '-' }}</dd>
+        <dt class="col-sm-4">Batch</dt><dd class="col-sm-8"><span class="badge text-bg-primary">{{ student.batch or '-' }}</span></dd>
+        <dt class="col-sm-4">Current Academic Year</dt><dd class="col-sm-8"><span class="badge text-bg-success">{{ student.current_year or '-' }}</span></dd>
+        <dt class="col-sm-4">Address</dt><dd class="col-sm-8">{{ student.address }}</dd>
+        <dt class="col-sm-4">Phone Number</dt><dd class="col-sm-8">{{ student.phone }}</dd>
+        <dt class="col-sm-4">Created Date</dt><dd class="col-sm-8">{{ student.created_at.strftime('%d %b %Y, %I:%M %p') if student.created_at else '-' }}</dd>
+      </dl>
+      <div class="action-row mt-3">
+        <a class="btn btn-outline-secondary" href="{{ url_for('staff.edit_student', student_id=student.id) }}"><i class="bi bi-pencil"></i> Edit</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

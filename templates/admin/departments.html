@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><h1>Departments</h1></div>
+<div class="panel mb-3"><form method="post" class="row g-2"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="col-md-10"><input class="form-control" name="name" placeholder="Department name" required></div><div class="col-md-2"><button class="btn btn-primary w-100">Add</button></div></form></div>
+<div class="panel"><ul class="list-group list-group-flush">{% for d in departments %}<li class="list-group-item">{{ d.name }}</li>{% endfor %}</ul></div>
+{% endblock %}

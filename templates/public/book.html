@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><h1>Book Visitor Appointment</h1></div>
+<form method="post" enctype="multipart/form-data" class="vstack gap-3">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="panel">
+    <h2>Visitor Personal Details</h2>
+    <div class="row g-3">
+      <div class="col-md-4"><label class="form-label">Full Name</label><input class="form-control" name="full_name" value="{{ current_user.name }}" required></div>
+      <div class="col-md-4"><label class="form-label">Phone</label><input class="form-control" name="phone" value="{{ current_user.phone }}" pattern="[0-9]{10}" required></div>
+      <div class="col-md-4"><label class="form-label">Email</label><input class="form-control" type="email" name="email" value="{{ current_user.email }}" required></div>
+      <div class="col-md-4"><label class="form-label">Gender</label><select class="form-select" name="gender" required><option>Male</option><option>Female</option><option>Other</option></select></div>
+      <div class="col-md-4"><label class="form-label">Visitor Photo</label><input class="form-control" type="file" name="visitor_photo" accept=".png,.jpg,.jpeg"></div>
+      <div class="col-md-4"><label class="form-label">ID Proof Number</label><input class="form-control" name="id_proof_number" placeholder="Aadhaar / ID card number" required></div>
+      <div class="col-md-6"><label class="form-label">ID Proof Upload</label><input class="form-control" type="file" name="id_proof" accept=".png,.jpg,.jpeg,.pdf" required></div>
+      <div class="col-md-6"><label class="form-label">Address</label><textarea class="form-control" name="address" rows="2" required></textarea></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Relationship Details</h2>
+    <div class="row g-3">
+      <div class="col-md-4"><label class="form-label">Who are you?</label><select class="form-select" name="visitor_type" required><option>Parent</option><option>Father</option><option>Mother</option><option>Guardian</option><option>Brother</option><option>Sister</option><option>Relative</option><option>Friend</option><option>Alumni</option><option>Guest</option><option>Other</option></select></div>
+      <div class="col-md-8"><label class="form-label">Relationship</label><input class="form-control" name="relationship" placeholder="Father of student, Brother, Friend" required></div>
+      <div class="col-md-4"><label class="form-label">Parent Name</label><input class="form-control" name="parent_name"></div>
+      <div class="col-md-4"><label class="form-label">Guardian Name</label><input class="form-control" name="guardian_name"></div>
+      <div class="col-md-4"><label class="form-label">Relative Name</label><input class="form-control" name="relative_name"></div>
+      <div class="col-md-6"><label class="form-label">Emergency Contact Name</label><input class="form-control" name="emergency_contact_name" required></div>
+      <div class="col-md-6"><label class="form-label">Emergency Contact Phone</label><input class="form-control" name="emergency_contact_phone" pattern="[0-9]{10}" required></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Student / Person To Meet</h2>
+    <div class="row g-3">
+      <div class="col-md-4"><label class="form-label">Student ID</label><input class="form-control" name="student_id" id="studentIdInput" placeholder="ST2026CS014"></div>
+      <div class="col-md-4"><label class="form-label">Student Name</label><input class="form-control" name="student_name" id="studentNameInput"></div>
+      <div class="col-md-2"><label class="form-label">Department</label><input class="form-control" name="department" id="studentDeptInput"></div>
+      <div class="col-md-2"><label class="form-label">Year</label><input class="form-control" name="year_of_study" placeholder="2nd Year"></div>
+      <div class="col-12"><div class="alert alert-info d-none mb-0" id="studentProfileBox"></div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Visit Details</h2>
+    <div class="row g-3">
+      <div class="col-md-5"><label class="form-label">Whom to meet</label><select class="form-select" name="authority_id" required>{% for a in authorities %}<option value="{{ a.id }}">{{ a.name }} - {{ a.role|title }}</option>{% endfor %}</select></div>
+      <div class="col-md-3"><label class="form-label">Date</label><input class="form-control" type="date" name="visit_date" required></div>
+      <div class="col-md-4"><label class="form-label">Time slot</label><select class="form-select" name="visit_time" required>{% for s in slots %}<option>{{ s.label }}</option>{% endfor %}</select></div>
+      <div class="col-12"><label class="form-label">Purpose of Visit</label><textarea class="form-control" name="purpose" required rows="3" placeholder="Fee discussion, meeting staff, admission enquiry"></textarea></div>
+      <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_vip" id="isVip"><label class="form-check-label" for="isVip">VIP visitor</label></div></div>
+      <div class="col-md-8 text-md-end"><button class="btn btn-outline-secondary" type="reset">Reset</button> <button class="btn btn-primary">Generate QR Gatepass</button></div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("studentIdInput");
+  const nameInput = document.getElementById("studentNameInput");
+  const deptInput = document.getElementById("studentDeptInput");
+  const box = document.getElementById("studentProfileBox");
+  let timer;
+  input.addEventListener("input", () => {
+    clearTimeout(timer);
+    const value = input.value.trim();
+    if (!value) {
+      box.classList.add("d-none");
+      return;
+    }
+    timer = setTimeout(async () => {
+      const response = await fetch(`/public/api/student/${encodeURIComponent(value)}`);
+      const data = await response.json();
+      if (data.found) {
+        nameInput.value = data.student_name;
+        deptInput.value = data.department;
+        box.className = "alert alert-success mb-0";
+        box.textContent = `${data.student_name} found in ${data.department}.`;
+      } else {
+        box.className = "alert alert-warning mb-0";
+        box.textContent = "No student record found. You can still enter details manually.";
+      }
+    }, 300);
+  });
+});
+</script>
+{% endblock %}

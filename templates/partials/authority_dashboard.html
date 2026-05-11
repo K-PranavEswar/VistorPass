@@ -1,0 +1,9 @@
+<div class="page-head">
+  <h1>{{ accent }}</h1>
+  <form method="post" action="{{ url_for(current_user.role + '.availability') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-check form-switch"><input onchange="this.form.submit()" class="form-check-input" type="checkbox" name="available" {% if current_user.is_available %}checked{% endif %}><label class="form-check-label">Available</label></div>
+  </form>
+</div>
+<div class="stat-grid"><div class="stat-card"><span>Pending</span><strong>{{ pending|length }}</strong></div><div class="stat-card"><span>Total Requests</span><strong>{{ visitors|length }}</strong></div></div>
+<div class="panel mt-3"><h2>Visitor Requests</h2>{% include 'partials/authority_requests.html' %}</div>

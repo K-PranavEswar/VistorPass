@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% block title %}Visitor Portal Login · Campus GatePass{% endblock %}
+
+{% block content %}
+<style>
+  /* Custom UI/UX Enhancements for GatePass */
+  .gatepass-card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    max-width: 900px;
+    margin: 2rem auto;
+  }
+  
+  .gatepass-brand-panel {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .gatepass-form-panel {
+    padding: 3.5rem;
+    background-color: #ffffff;
+  }
+
+  /* Floating labels for a cleaner, modern input experience */
+  .form-floating > label {
+    color: #6b7280;
+  }
+  
+  .form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+  }
+
+  .btn-gatepass {
+    background-color: #1e3a8a;
+    border-color: #1e3a8a;
+    padding: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-gatepass:hover {
+    background-color: #172554;
+    border-color: #172554;
+    transform: translateY(-1px);
+  }
+
+  .auth-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .auth-link:hover {
+    text-decoration: underline;
+    color: #1e3a8a;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .gatepass-brand-panel {
+      padding: 2rem;
+      text-align: center;
+    }
+    .gatepass-form-panel {
+      padding: 2rem;
+    }
+  }
+</style>
+
+<div class="container">
+  <div class="card gatepass-card">
+    <div class="row g-0">
+      
+      <!-- Left Branding Panel -->
+      <div class="col-md-5 gatepass-brand-panel">
+        <!-- Optional: Replace this with an actual SVG logo of the college -->
+        <div class="mb-4 d-md-block d-none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-shield-check" viewBox="0 0 16 16">
+            <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.417.545 7.099 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
+            <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+          </svg>
+        </div>
+        <h2 class="fw-bold mb-3">Welcome to Campus</h2>
+        <p class="opacity-75 mb-0">Secure, streamlined access for visitors and guests. Please log in to manage your gatepasses.</p>
+      </div>
+
+      <!-- Right Form Panel -->
+      <div class="col-md-7 gatepass-form-panel">
+        <div class="mb-4">
+          <h3 class="fw-bold text-dark">Sign In</h3>
+          <p class="text-muted small">Enter your credentials to access the portal</p>
+        </div>
+
+        <form method="post" class="vstack gap-4">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          
+          <!-- Floating Labels for better UX -->
+          <div class="form-floating">
+            <input type="text" class="form-control bg-light border-0" id="identityInput" name="identity" placeholder="Username or email" required autofocus>
+            <label for="identityInput">Username or Email</label>
+          </div>
+          
+          <div class="form-floating">
+            <input type="password" class="form-control bg-light border-0" id="passwordInput" name="password" placeholder="Password" required>
+            <label for="passwordInput">Password</label>
+          </div>
+
+          <!-- Utility Links -->
+          <div class="d-flex justify-content-between align-items-center mt-[-1rem]">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="rememberMe">
+              <label class="form-check-label text-muted small" for="rememberMe">
+                Remember me
+              </label>
+            </div>
+            <a href="{{ url_for('auth.forgot_password') }}" class="auth-link small">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-gatepass w-100 mt-2 text-white shadow-sm">
+            Access Portal
+          </button>
+
+          <hr class="text-muted my-2">
+
+          <div class="text-center">
+            <p class="text-muted small mb-0">Don't have an account? <a href="{{ url_for('auth.register') }}" class="auth-link fw-bold">Register as a Visitor</a></p>
+          </div>
+          
+          <!-- Dev Note cleanly integrated -->
+          <div class="alert alert-info py-2 px-3 mt-3 mb-0 small border-0 text-center" role="alert">
+            <i class="bi bi-info-circle me-1"></i> Default admin: <strong>admin</strong> / <strong>admin123</strong>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

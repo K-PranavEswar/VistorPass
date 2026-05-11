@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><h1>Visitor Logs</h1></div>
+<div class="panel mb-3"><h2>Visitors</h2>{% include 'partials/visitor_table.html' %}</div>
+<div class="panel"><h2>QR Logs</h2><div class="table-responsive"><table class="table"><thead><tr><th>Visitor</th><th>Security</th><th>Scan Time</th><th>Status</th></tr></thead><tbody>{% for log in qr_logs %}<tr><td>#{{ log.visitor_id }}</td><td>{{ log.security.name }}</td><td>{{ log.scan_time }}</td><td>{{ log.status }}</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

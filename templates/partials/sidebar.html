@@ -1,0 +1,28 @@
+{% set role = current_user.role %}
+<div class="sidebar-title">{{ role|title }} Workspace</div>
+<nav class="nav flex-column gap-1">
+  {% if role == 'public' %}
+  <a class="nav-link" href="{{ url_for('public.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+  <a class="nav-link" href="{{ url_for('public.book') }}"><i class="bi bi-calendar-plus"></i> Book Visit</a>
+  {% elif role == 'security' %}
+  <a class="nav-link" href="{{ url_for('security.dashboard') }}"><i class="bi bi-shield-check"></i> Dashboard</a>
+  <a class="nav-link" href="{{ url_for('security.scanner') }}"><i class="bi bi-qr-code-scan"></i> QR Scanner</a>
+  <a class="nav-link" href="{{ url_for('security.search') }}"><i class="bi bi-person-vcard"></i> College ID Search</a>
+  {% elif role in ['staff','principal','management'] %}
+  <a class="nav-link" href="{{ url_for(role + '.dashboard') }}"><i class="bi bi-grid"></i> Dashboard</a>
+  <a class="nav-link" href="{{ url_for(role + '.requests') }}"><i class="bi bi-inbox"></i> Requests</a>
+  {% if role == 'staff' %}
+  <div class="sidebar-title mt-3 mb-1">Students</div>
+  <a class="nav-link" href="{{ url_for('staff.add_student') }}"><i class="bi bi-person-plus"></i> Add Student</a>
+  <a class="nav-link" href="{{ url_for('staff.students') }}"><i class="bi bi-mortarboard"></i> Manage Students</a>
+  {% endif %}
+  {% elif role == 'admin' %}
+  <a class="nav-link" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-bar-chart"></i> Analytics</a>
+  <a class="nav-link" href="{{ url_for('admin.users') }}"><i class="bi bi-people"></i> Manage Users</a>
+  <a class="nav-link" href="{{ url_for('admin.departments') }}"><i class="bi bi-building"></i> Departments</a>
+  <a class="nav-link" href="{{ url_for('admin.timeslots') }}"><i class="bi bi-clock"></i> Time Slots</a>
+  <a class="nav-link" href="{{ url_for('admin.blacklist') }}"><i class="bi bi-person-x"></i> Blacklist</a>
+  <a class="nav-link" href="{{ url_for('admin.logs') }}"><i class="bi bi-journal-text"></i> Logs</a>
+  {% endif %}
+  <a class="nav-link" href="{{ url_for('auth.change_password') }}"><i class="bi bi-key"></i> Change Password</a>
+</nav>

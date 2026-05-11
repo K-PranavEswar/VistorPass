@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><h1>Visitor Dashboard</h1><a class="btn btn-primary" href="{{ url_for('public.book') }}"><i class="bi bi-calendar-plus"></i> Book Appointment</a></div>
+<div class="panel">
+  <h2>Booking History</h2>
+  {% include 'partials/visitor_table.html' %}
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><h1>Gatepass #{{ visitor.id }}</h1><a class="btn btn-outline-primary" href="{{ url_for('static', filename=visitor.qr_code) }}" download>Download QR</a></div>
+<div class="row g-3">
+  <div class="col-lg-4"><div class="panel text-center"><img class="qr-img" src="{{ url_for('static', filename=visitor.qr_code) }}"><div class="status-pill">{{ visitor.status }}</div></div></div>
+  <div class="col-lg-8"><div class="panel"><h2>Status Timeline</h2><div class="timeline">{% for item in timeline %}<span class="{% if visitor.status in timeline and timeline.index(item) <= timeline.index(visitor.status) %}active{% endif %}">{{ item }}</span>{% endfor %}</div></div></div>
+</div>
+{% endblock %}

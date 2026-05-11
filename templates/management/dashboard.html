@@ -1,0 +1,3 @@
+{% extends 'base.html' %}
+{% block content %}{% set accent='Management Center' %}{% include 'partials/authority_dashboard.html' %}<div class="panel mt-3"><canvas id="managementChart" height="90"></canvas></div>{% endblock %}
+{% block scripts %}<script>renderSimpleChart('managementChart', ['Pending','Approved','Rejected'], [{{ pending|length }}, {{ visitors|selectattr('status','equalto','authority_approved')|list|length }}, {{ visitors|selectattr('status','equalto','rejected')|list|length }}]);</script>{% endblock %}

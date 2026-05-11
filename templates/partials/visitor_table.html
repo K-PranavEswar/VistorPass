@@ -1,0 +1,38 @@
+<div class="table-responsive">
+<table class="table align-middle">
+  <thead>
+    <tr>
+      <th>Visitor Type</th>
+      <th>Relationship</th>
+      <th>Student Name</th>
+      <th>Purpose</th>
+      <th>Authority</th>
+      <th>Visit Date</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for visitor in visitors %}
+  <tr>
+    <td><strong>{{ visitor.visitor_type or 'Visitor' }}</strong><div class="text-muted small">{{ visitor.public_user.name }}</div></td>
+    <td>{{ visitor.relationship or '-' }}</td>
+    <td>{{ visitor.student_name or '-' }}</td>
+    <td class="text-truncate" style="max-width: 220px;">{{ visitor.purpose }}</td>
+    <td>{{ visitor.authority.name }}</td>
+    <td>{{ visitor.visit_date }}<div class="text-muted small">{{ visitor.visit_time }}</div></td>
+    <td><span class="badge text-bg-info">{{ visitor.status }}</span></td>
+    <td>
+      {% if current_user.role == 'public' %}
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('public.visitor_detail', visitor_id=visitor.id) }}">View</a>
+      {% elif current_user.role == 'security' %}
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('security.visitor_detail', visitor_id=visitor.id) }}">Open</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="8" class="text-muted text-center">No visitor records yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head">
+    <h1>Search</h1>
+</div>
+
+<div class="panel">
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-9">
+            <input type="text" class="form-control" name="college_id" value="{{ query }}" placeholder="Search college ID, visitor name, student ID, parent name, relationship, or phone">
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary w-100">Search</button>
+        </div>
+    </form>
+
+    {% if visitor_results %}
+    <h2>Visitor Matches</h2>
+    <div class="table-responsive mb-4">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr><th>Visitor</th><th>Type</th><th>Relationship</th><th>Student</th><th>Phone</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for visitor in visitor_results %}
+                <tr>
+                    <td>{{ visitor.public_user.name }}</td>
+                    <td>{{ visitor.visitor_type or 'Visitor' }}</td>
+                    <td>{{ visitor.relationship or '-' }}</td>
+                    <td>{{ visitor.student_name or '-' }}<div class="text-muted small">{{ visitor.student_id or '' }}</div></td>
+                    <td>{{ visitor.public_user.phone }}</td>
+                    <td><span class="badge text-bg-info">{{ visitor.status }}</span></td>
+                    <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('security.visitor_detail', visitor_id=visitor.id) }}">Open</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <h2>College ID Matches</h2>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Photo</th>
+                    <th>College ID</th>
+                    <th>Full Name</th>
+                    <th>Department</th>
+                    <th>Phone</th>
+                    <th>Designation</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in results %}
+                <tr>
+                    <td><img src="{% if user.photo %}{{ url_for('static', filename=user.photo) }}{% else %}https://placehold.co/60x60?text=ID{% endif %}" width="60" height="60" style="border-radius:50%; object-fit:cover;"></td>
+                    <td>{{ user.college_id }}</td>
+                    <td>{{ user.full_name if user.full_name is defined else user.name }}</td>
+                    <td>{{ user.department }}</td>
+                    <td>{{ user.phone }}</td>
+                    <td>{{ user.designation if user.designation is defined else 'Student' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center text-muted">No college ID matches.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

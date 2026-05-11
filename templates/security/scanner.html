@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head">
+  <h1>QR Scanner</h1>
+  <a class="btn btn-outline-primary" href="{{ url_for('security.dashboard') }}">
+    <i class="bi bi-arrow-left"></i> Security Dashboard
+  </a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="panel">
+      <h2>Scan or Paste QR Payload</h2>
+      <form method="post" class="vstack gap-3">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <textarea
+          class="form-control"
+          name="qr_payload"
+          rows="9"
+          placeholder="Paste decoded visitor or student QR payload here"
+          required></textarea>
+        <button class="btn btn-primary">
+          <i class="bi bi-qr-code-scan"></i> Validate QR
+        </button>
+      </form>
+      <p class="text-muted small mt-3 mb-0">
+        Visitor QR and student QR payloads are supported. Invalid or unknown QR data will show an error instead of a blank page.
+      </p>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    {% if error %}
+    <div class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    {% if visitor %}
+      {% include 'security/visitor_card.html' %}
+    {% elif student %}
+    <div class="panel visitor-card">
+      <div class="d-flex gap-3 align-items-center">
+        <img
+          class="avatar-lg"
+          src="{{ url_for('static', filename=student.photo) if student.photo|default('', true) else 'https://placehold.co/96x96?text=Student' }}"
+          alt="Student photo">
+        <div>
+          <h2>{{ student.student_name|default(student.full_name|default('Student', true), true) }}</h2>
+          <p class="mb-0">{{ student.student_id|default(student.college_id|default('-', true), true) }}</p>
+          <div class="status-pill mt-2">Student QR Verified</div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="detail-label">Student ID</div>
+          <div>{{ student.student_id|default(student.college_id|default('-', true), true) }}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="detail-label">Student Name</div>
+          <div>{{ student.student_name|default(student.full_name|default('-', true), true) }}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="detail-label">Department</div>
+          <div>{{ student.department|default('-', true) }}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="detail-label">Course</div>
+          <div>{{ student.course|default(student.course_applied|default('-', true), true) }}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="detail-label">Batch</div>
+          <div><span class="badge text-bg-primary">{{ student.batch|default('-', true) }}</span></div>
+        </div>
+        <div class="col-md-6">
+          <div class="detail-label">Current Year</div>
+          <div><span class="badge text-bg-success">{{ student.current_year|default('-', true) }}</span></div>
+        </div>
+        <div class="col-md-6">
+          <div class="detail-label">Admission Year</div>
+          <div>{{ student.admission_year|default('-', true) }}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="detail-label">Phone</div>
+          <div>{{ student.phone|default('-', true) }}</div>
+        </div>
+        <div class="col-12">
+          <div class="detail-label">Address</div>
+          <div>{{ student.address|default('-', true) }}</div>
+        </div>
+      </div>
+
+      {% if student.qr_code|default('', true) %}
+      <hr>
+      <div class="text-center">
+        <h2>Student QR</h2>
+        <img
+          src="{{ url_for('static', filename=student.qr_code) }}"
+          class="qr-img border rounded p-2 bg-white"
+          alt="Student QR">
+      </div>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="panel text-center text-muted">
+      <i class="bi bi-qr-code-scan fs-1 d-block mb-2"></i>
+      Scan a visitor or student QR code to view details.
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
