@@ -18,7 +18,8 @@
     </div>
     <div class="col-md-6">
       <label class="form-label">Department</label>
-      <input class="form-control" name="department" value="{{ student.department if is_edit else '' }}" placeholder="Computer Science" required>
+      <input class="form-control bg-light" value="{{ teacher_department or 'Not assigned' }}" readonly>
+      <div class="form-text">Department is assigned from your staff account.</div>
     </div>
     <div class="col-md-3">
       <label class="form-label">Course</label>

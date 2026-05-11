@@ -2,7 +2,8 @@ import os
 import re
 from datetime import date
 
-from flask import Blueprint, current_app, flash, redirect, render_template, request, send_from_directory, url_for
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, send_from_directory, url_for
+from sqlalchemy import func
 
 from extensions import db
 from models import Student, User, Visitor
@@ -89,12 +90,37 @@ def admission_year_options():
     return list(range(2020, current_year + 6))
 
 
+def staff_department():
+    user = current_user()
+    return (user.department or "").strip() if user else ""
+
+
+def normalized_department(value):
+    return (value or "").strip().lower()
+
+
+def department_students_query():
+    department = staff_department()
+    if not department:
+        return Student.query.filter(Student.id == -1)
+    return Student.query.filter(func.lower(func.trim(Student.department)) == normalized_department(department))
+
+
+def get_department_student_or_403(student_id):
+    student = Student.query.get_or_404(student_id)
+    department = staff_department()
+    if not department or normalized_department(student.department) != normalized_department(department):
+        abort(403, description="Access denied. Student belongs to another department.")
+    return student
+
+
 @staff_bp.route("/students")
 @roles_required("staff")
 def students():
     page = request.args.get("page", 1, type=int)
     search = request.args.get("q", "").strip()
-    query = Student.query
+    department = staff_department()
+    query = department_students_query()
     if search:
         pattern = f"%{search}%"
         query = query.filter(
@@ -117,16 +143,20 @@ def students():
         pagination=pagination,
         students=pagination.items,
         search=search,
+        teacher_department=department,
     )
 
 
 @staff_bp.route("/students/add", methods=["GET", "POST"])
 @roles_required("staff")
 def add_student():
+    department = staff_department()
+    if not department:
+        flash("Your staff account does not have a department assigned. Contact admin.", "danger")
+        return redirect(url_for("staff.students"))
     if request.method == "POST":
         student_id_value = request.form["student_id"].strip().upper()
         student_name = request.form["student_name"].strip()
-        department = request.form["department"].strip()
         course = request.form["course"]
         admission_year = int(request.form["admission_year"])
         address = request.form["address"].strip()
@@ -134,15 +164,15 @@ def add_student():
         batch, current_year = calculate_batch_and_year(course, admission_year)
         if not all([student_id_value, student_name, department, course, address, phone]):
             flash("All fields are required.", "danger")
-            return render_template("staff/add_student.html", courses=COURSE_OPTIONS, admission_years=admission_year_options())
+            return render_template("staff/add_student.html", courses=COURSE_OPTIONS, admission_years=admission_year_options(), teacher_department=department)
         if not _valid_phone(phone):
             flash("Enter a valid 10-digit Indian phone number.", "danger")
-            return render_template("staff/add_student.html", courses=COURSE_OPTIONS, admission_years=admission_year_options())
+            return render_template("staff/add_student.html", courses=COURSE_OPTIONS, admission_years=admission_year_options(), teacher_department=department)
         if Student.query.filter(
             (Student.student_id == student_id_value) | (Student.college_id == student_id_value)
         ).first():
             flash("Student ID already exists.", "danger")
-            return render_template("staff/add_student.html", courses=COURSE_OPTIONS, admission_years=admission_year_options())
+            return render_template("staff/add_student.html", courses=COURSE_OPTIONS, admission_years=admission_year_options(), teacher_department=department)
 
         student = Student(
             student_id=student_id_value,
@@ -165,17 +195,17 @@ def add_student():
         db.session.commit()
         flash("Student saved and QR code generated.", "success")
         return redirect(url_for("staff.view_student", student_id=student.id))
-    return render_template("staff/add_student.html", courses=COURSE_OPTIONS, admission_years=admission_year_options())
+    return render_template("staff/add_student.html", courses=COURSE_OPTIONS, admission_years=admission_year_options(), teacher_department=department)
 
 
 @staff_bp.route("/students/edit/<int:student_id>", methods=["GET", "POST"])
 @roles_required("staff")
 def edit_student(student_id):
-    student = Student.query.get_or_404(student_id)
+    student = get_department_student_or_403(student_id)
+    department = staff_department()
     if request.method == "POST":
         new_student_id = request.form["student_id"].strip().upper()
         student_name = request.form["student_name"].strip()
-        department = request.form["department"].strip()
         course = request.form["course"]
         admission_year = int(request.form["admission_year"])
         address = request.form["address"].strip()
@@ -183,17 +213,17 @@ def edit_student(student_id):
         batch, current_year = calculate_batch_and_year(course, admission_year)
         if not all([new_student_id, student_name, department, course, address, phone]):
             flash("All fields are required.", "danger")
-            return render_template("staff/add_student.html", student=student, courses=COURSE_OPTIONS, admission_years=admission_year_options())
+            return render_template("staff/add_student.html", student=student, courses=COURSE_OPTIONS, admission_years=admission_year_options(), teacher_department=department)
         if not _valid_phone(phone):
             flash("Enter a valid 10-digit Indian phone number.", "danger")
-            return render_template("staff/add_student.html", student=student, courses=COURSE_OPTIONS, admission_years=admission_year_options())
+            return render_template("staff/add_student.html", student=student, courses=COURSE_OPTIONS, admission_years=admission_year_options(), teacher_department=department)
         duplicate = Student.query.filter(
             Student.id != student.id,
             (Student.student_id == new_student_id) | (Student.college_id == new_student_id),
         ).first()
         if duplicate:
             flash("Student ID already exists.", "danger")
-            return render_template("staff/add_student.html", student=student, courses=COURSE_OPTIONS, admission_years=admission_year_options())
+            return render_template("staff/add_student.html", student=student, courses=COURSE_OPTIONS, admission_years=admission_year_options(), teacher_department=department)
 
         old_qr = student.qr_code
         student.student_id = new_student_id
@@ -216,13 +246,13 @@ def edit_student(student_id):
         db.session.commit()
         flash("Student updated.", "success")
         return redirect(url_for("staff.view_student", student_id=student.id))
-    return render_template("staff/add_student.html", student=student, courses=COURSE_OPTIONS, admission_years=admission_year_options())
+    return render_template("staff/add_student.html", student=student, courses=COURSE_OPTIONS, admission_years=admission_year_options(), teacher_department=department)
 
 
 @staff_bp.route("/students/delete/<int:student_id>", methods=["POST"])
 @roles_required("staff")
 def delete_student(student_id):
-    student = Student.query.get_or_404(student_id)
+    student = get_department_student_or_403(student_id)
     qr_code = student.qr_code
     db.session.delete(student)
     db.session.commit()
@@ -235,16 +265,17 @@ def delete_student(student_id):
 
 
 @staff_bp.route("/students/view/<int:student_id>")
+@staff_bp.route("/student/<int:student_id>")
 @roles_required("staff")
 def view_student(student_id):
-    student = Student.query.get_or_404(student_id)
+    student = get_department_student_or_403(student_id)
     return render_template("staff/view_student.html", student=student)
 
 
 @staff_bp.route("/student/download-qr/<int:student_id>")
 @roles_required("staff")
 def download_student_qr(student_id):
-    student = Student.query.get_or_404(student_id)
+    student = get_department_student_or_403(student_id)
     if not student.qr_code:
         flash("QR code is not available for this student.", "warning")
         return redirect(url_for("staff.view_student", student_id=student.id))

@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="page-head">
-  <h1>Manage Students</h1>
+  <div>
+    <h1>Manage Students</h1>
+    <p class="text-muted mb-0">Department: <strong>{{ teacher_department or 'Not assigned' }}</strong></p>
+  </div>
   <a class="btn btn-primary" href="{{ url_for('staff.add_student') }}"><i class="bi bi-person-plus"></i> Add Student</a>
 </div>
 <div class="panel mb-3">
@@ -56,7 +59,15 @@
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="10" class="text-center text-muted">No students found.</td></tr>
+        <tr>
+          <td colspan="10" class="text-center text-muted py-4">
+            {% if search %}
+            No students found in your department for this search.
+            {% else %}
+            No students available in your department.
+            {% endif %}
+          </td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
